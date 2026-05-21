@@ -1,8 +1,13 @@
 ## [6.3.4] - 2026-05-20
 - Added `forceRoute` parameter support in `Modular.to.navigate(...)` to allow navigating to the current path when explicitly forced.
 
-## [6.3.4] - 2025-05-02
-- Fix Deep Link query parameters
+## [6.4.1] - 2025/06/12
+- Fix AppModule Dispose.
+
+## [6.4.0] - 2025-06-10
+- Fix Deep Link query parameters.
+- Update Result.
+
 
 ## [6.3.3] - 2024-04-08
 - Fix Deep Link
