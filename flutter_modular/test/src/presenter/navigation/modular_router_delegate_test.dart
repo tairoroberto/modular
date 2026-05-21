@@ -18,8 +18,7 @@ import '../modular_base_test.dart' hide GetArgumentsMock, SetArgumentsMock;
 import 'modular_page_test.dart';
 import 'modular_route_information_parser_test.dart';
 
-class ModularRouteInformationParserMock extends Mock
-    implements ModularRouteInformationParser {}
+class ModularRouteInformationParserMock extends Mock implements ModularRouteInformationParser {}
 
 class BuildContextMock extends Mock implements BuildContext {}
 
@@ -90,8 +89,7 @@ void main() {
   test('navigate blink', () async {
     final route1 = ParallelRouteMock();
     when(() => route1.uri).thenReturn(Uri.parse('/test2'));
-    when(() => parser.selectBook('/test2'))
-        .thenAnswer((_) async => ModularBook(routes: [route1]));
+    when(() => parser.selectBook('/test2')).thenAnswer((_) async => ModularBook(routes: [route1]));
 
     delegate.navigate('/test');
     delegate.navigate('/test2');
@@ -106,8 +104,7 @@ void main() {
   test('navigate', () async {
     final route1 = ParallelRouteMock();
     when(() => route1.uri).thenReturn(Uri.parse('/test'));
-    when(() => parser.selectBook('/test'))
-        .thenAnswer((_) async => ModularBook(routes: [route1]));
+    when(() => parser.selectBook('/test')).thenAnswer((_) async => ModularBook(routes: [route1]));
 
     final getArgsMock = GetArgumentsMock();
     final setArgsMock = SetArgumentsMock();
@@ -128,12 +125,40 @@ void main() {
     expect(delegate.path, '/test');
     expect(delegate.navigateHistory, delegate.currentConfiguration!.routes);
   });
+
+  test('navigate should ignore same path when forceRoute is false', () async {
+    final route = ParallelRouteMock();
+    when(() => route.uri).thenReturn(Uri.parse('/test'));
+
+    delegate.currentConfiguration = ModularBook(routes: [route]);
+
+    await delegate.navigate('/test');
+
+    verifyNever(() => parser.selectBook(any(), arguments: any(named: 'arguments')));
+    expect(delegate.currentConfiguration?.uri.toString(), '/test');
+  });
+
+  test('navigate should allow same path when forceRoute is true', () async {
+    final route = ParallelRouteMock();
+    final updatedRoute = ParallelRouteMock();
+    when(() => route.uri).thenReturn(Uri.parse('/test'));
+    when(() => updatedRoute.uri).thenReturn(Uri.parse('/test'));
+    when(() => parser.selectBook('/test', arguments: null)).thenAnswer((_) async => ModularBook(routes: [updatedRoute]));
+
+    delegate.currentConfiguration = ModularBook(routes: [route]);
+
+    await Future.delayed(const Duration(milliseconds: 600));
+    await delegate.navigate('/test', forceRoute: true);
+
+    verify(() => parser.selectBook('/test', arguments: null)).called(1);
+    expect(delegate.currentConfiguration?.uri.toString(), '/test');
+  });
+
   test('onPopPage', () {
     final route = RouteMock();
     final parallel = ParallelRouteMock();
     when(() => parallel.uri).thenReturn(Uri.parse('/'));
-    final page = ModularPage(
-        route: parallel, args: ModularArguments.empty(), flags: ModularFlags());
+    final page = ModularPage(route: parallel, args: ModularArguments.empty(), flags: ModularFlags());
     when(() => route.didPop(null)).thenReturn(true);
     when(() => route.settings).thenReturn(page);
     when(() => route.isFirst).thenReturn(false);
@@ -159,8 +184,7 @@ void main() {
     final route = RouteMock();
     final parallel = ParallelRouteMock();
     when(() => parallel.uri).thenReturn(Uri.parse('/'));
-    final page = ModularPage(
-        route: parallel, args: ModularArguments.empty(), flags: ModularFlags());
+    final page = ModularPage(route: parallel, args: ModularArguments.empty(), flags: ModularFlags());
     when(() => route.didPop(null)).thenReturn(true);
     when(() => route.settings).thenReturn(page);
     when(() => route.isFirst).thenReturn(false);
@@ -171,8 +195,7 @@ void main() {
     final childParallel = ParallelRouteMock();
     when(() => childParallel.uri).thenReturn(Uri.parse('/child'));
     when(() => childParallel.parent).thenReturn('/');
-    final childPage = ModularPage(
-        route: childParallel, args: ModularArguments.empty(), flags: ModularFlags());
+    final childPage = ModularPage(route: childParallel, args: ModularArguments.empty(), flags: ModularFlags());
     when(() => childRoute.didPop(null)).thenReturn(true);
     when(() => childRoute.settings).thenReturn(childPage);
     when(() => childRoute.isFirst).thenReturn(false);
@@ -218,8 +241,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route2]));
     delegate.pushNamed('/pushForce', forRoot: true);
     await Future.delayed(const Duration(milliseconds: 400));
@@ -254,8 +276,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route2]));
     delegate.pushNamed('/pushForce');
     await Future.delayed(const Duration(milliseconds: 400));
@@ -292,8 +313,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route2]));
     delegate.pushReplacementNamed('/pushForce', forRoot: true);
     await Future.delayed(const Duration(milliseconds: 400));
@@ -336,8 +356,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1, route2]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route3]));
     delegate.pushReplacementNamed('/pushForce');
     await Future.delayed(const Duration(milliseconds: 400));
@@ -371,8 +390,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route2]));
     delegate.popAndPushNamed('/pushForce');
     await Future.delayed(const Duration(milliseconds: 400));
@@ -388,8 +406,7 @@ void main() {
   });
   test('push ', () async {
     final route = MaterialPageRoute(builder: (_) => Container());
-    when(() => navigatorState.push(route))
-        .thenAnswer((_) => Future.value(true));
+    when(() => navigatorState.push(route)).thenAnswer((_) => Future.value(true));
     await delegate.push(route);
     verify(() => navigatorState.push(route));
   });
@@ -454,11 +471,9 @@ void main() {
 
     when(() => navigatorState.popUntil(any())).thenReturn(null);
 
-    delegate.currentConfiguration =
-        ModularBook(routes: [route1, route2, route3]);
+    delegate.currentConfiguration = ModularBook(routes: [route1, route2, route3]);
 
-    when(() => parser.selectBook('/pushForce2',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce2', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route3]));
     delegate.pushNamedAndRemoveUntil('/pushForce2', ModalRoute.withName('/'));
     await Future.delayed(const Duration(milliseconds: 400));
@@ -495,8 +510,7 @@ void main() {
 
     delegate.currentConfiguration = ModularBook(routes: [route1]);
 
-    when(() => parser.selectBook('/pushForce',
-            popCallback: any(named: 'popCallback')))
+    when(() => parser.selectBook('/pushForce', popCallback: any(named: 'popCallback')))
         .thenAnswer((_) async => ModularBook(routes: [route2]));
     delegate.pushNamedAndRemoveUntil('/pushForce', (_) => false, forRoot: true);
     await Future.delayed(const Duration(milliseconds: 400));
@@ -513,9 +527,6 @@ void main() {
     expect(() => route.opaque, throwsA(isA<UnimplementedError>()));
     expect(() => route.transitionDuration, throwsA(isA<UnimplementedError>()));
     expect(() => route.barrierLabel, throwsA(isA<UnimplementedError>()));
-    expect(
-        () => route.buildPage(
-            BuildContextMock(), AnimationMock(), AnimationMock()),
-        throwsA(isA<UnimplementedError>()));
+    expect(() => route.buildPage(BuildContextMock(), AnimationMock(), AnimationMock()), throwsA(isA<UnimplementedError>()));
   });
 }
